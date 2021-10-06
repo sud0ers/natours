@@ -4,6 +4,28 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
 
+exports.checkID = (req,res,next,val)=>{
+    console.log(`id id ${val}`)
+    if(req.params.id*1 > tours.length){
+        return res.status(404).json({
+            status:'not found',
+            message:'Invalid id'
+        });
+    }
+    next();
+};
+
+exports.checkBody = (req,res,next)=>{
+    // console.log(`id id ${val}`)
+    if(!req.body.name || !req.body.price){
+        return res.status(400).json({
+            status:'Bad Request',
+            message:'Missing name or price'
+        });
+    };
+    next();
+};
+
 exports.getAllTours = (req, res) => {
   console.log(req.requestTime);
   res.status(200).json({
@@ -18,12 +40,6 @@ exports.getTour = (req, res) => {
   const id = req.params.id * 1;
   const tour = tours.find((el) => el.id === id);
 
-  if (!tour) {
-    return res.status(404).json({
-      status: "Not found",
-      message: "Invalid id",
-    });
-  } else {
     // console.log(tour)
     res.status(200).json({
       status: "success",
@@ -33,9 +49,9 @@ exports.getTour = (req, res) => {
       // tours: tours
     });
   }
-};
 
-exports.postTour = (req, res) => {
+
+exports.createTour = (req, res) => {
   // console.log(req.body);
   const newId = tours[tours.length - 1].id + 1;
   const newTour = Object.assign({ id: newId }, req.body);
@@ -54,13 +70,7 @@ exports.postTour = (req, res) => {
   );
 };
 
-exports.delTour = (req, res) => {
-  if (req.params.id * 1 > tours.length) {
-    return res.status(404).json({
-      status: "Not found",
-      message: "Invalid id",
-    });
-  }
+exports.deleteTour = (req, res) => {
   res.status(204).json({
     staus: "success",
     data: null,
